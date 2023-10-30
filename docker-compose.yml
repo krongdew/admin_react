@@ -1,0 +1,30 @@
+version: '3'
+services:
+  mysql:
+    image: mysql:latest
+    container_name: mysql-container
+    environment:
+      MYSQL_ROOT_PASSWORD: 'Dew@0875350828#'
+      MYSQL_DATABASE: admin_panel
+    ports:
+      - "3306:3306"
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin-container
+    environment:
+      PMA_HOST: mysql
+      PMA_USER: root
+      PMA_PASSWORD: Dew@0875350828#
+    ports:
+      - "8080:80"
+  
+  web-server:
+    build: .
+    container_name: web-server-container
+    ports:
+      - "8081:80"
+    links:
+      - mysql
+    depends_on:
+      - mysql

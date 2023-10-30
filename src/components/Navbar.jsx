@@ -23,7 +23,24 @@ const NavButton = ({title, customFunc, icon, color, dotColor}) => (
 );
 
 const Navbar = () => {
-  const {activeMenu, setActiveMenu} = useStateContext();
+  const {activeMenu, setActiveMenu, isClicked, setisClicked, handleClick, screenSize, setScreenSize, currentColor} = useStateContext();
+
+  useEffect(() => {
+    const handleResize = () => setScreenSize(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+
+    handleResize();
+
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  useEffect(() => {
+    if(screenSize <= 900){
+      setActiveMenu(false);
+    }else {
+      setActiveMenu(true);
+    }
+  },[screenSize]);
 
   return (
     // md: on media device / mx: margin-x mean marginleft and right
@@ -31,21 +48,50 @@ const Navbar = () => {
 
       <NavButton title="Menu" customFunc={() => 
       setActiveMenu((prevActiveMenu) => !prevActiveMenu)} 
-      color="blue" icon={<AiOutlineMenu />} />
+      color={currentColor} icon={<AiOutlineMenu />} />
 
       <div className='flex'>
         <NavButton 
           title="Cart" 
           customFunc={() => handleClick('cart')} 
-          color="blue" 
+          color={currentColor} 
           icon={<FiShoppingCart />} 
         />
         <NavButton 
         title="Chat" 
         dotColor="#03C9D7" 
+        color={currentColor} 
         customFunc={() => handleClick('chat')} 
         icon={<BsChatLeft />} 
         />
+        <NavButton 
+        title="Notifications" 
+        dotColor="#03C9D7" 
+        color={currentColor} 
+        customFunc={() => handleClick('notification')} 
+        icon={<RiNotification3Line />} 
+        />
+        <TooltipComponent
+          content="Profile"
+          position='BottomCenter'
+        >
+          <div className=' flex items-center gap-2 cursor-pointer p-1 hover:bg-light-gray rounded-lg'
+          onClick={() => handleClick('UserProfile') }>
+          <img 
+          className='rounded-full w-8 h-8'
+          src={avatar} />
+          <p>
+            <span className='text-gray-400 text-14'>Hi, </span> {' '}
+            <span className='text-gray-400 fornt-bold ml-1 text-14'>Michael</span>
+          </p>
+          <MdKeyboardArrowDown className='text-gray-400 text-14' />
+          </div>
+        </TooltipComponent>
+
+        {isClicked.cart && <Cart/>}
+        {isClicked.chat && <Chat/>}
+        {isClicked.notification && <Notification/>}
+        {isClicked.UserProfile && <UserProfile/>}
       </div>
     </div>
   )
