@@ -1,11 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { GridComponent, ColumnsDirective, ColumnDirective, Page, Selection, Inject, Edit, Toolbar, Sort, Filter } from '@syncfusion/ej2-react-grids';
-import { Header } from '../components';
+import { Header,Button } from '../components';
 import { customersGrid } from '../data/customerdata'; // เรียกใช้คอลัมน์และคอมโพเนนต์ของตาราง
 import axios from 'axios'; // Library for making HTTP requests
+import { useStateContext } from '../contexts/ContextProvider';
 
 function Customers() {
   const [customersData, setCustomersData] = useState([]); // เก็บข้อมูลจาก API ด้วย useState
+  const [showAddForm, setShowAddForm] = useState(false);
+  const { currentColor } = useStateContext();
+
+const handleAddButtonClick = () => {
+  setShowAddForm(true);
+};
+
+const handleFormClose = () => {
+  setShowAddForm(false);
+};
   // State to manage form data
   // เปลี่ยนชื่อตัวแปร formData ในตำแหน่งที่ซ้ำกัน
 const [formDataAdd, setFormDataAdd] = useState({
@@ -46,6 +57,8 @@ const addCustomer = () => {
     .then((response) => {
       console.log('Customer added:', response.data);
       updateGrid();
+       // แสดงข้อความแจ้งเตือนเมื่อข้อมูลถูกเพิ่มเรียบร้อย
+       alert('เพิ่มข้อมูลสำเร็จ');
     })
     .catch((error) => {
       console.error('Error adding customer:', error);
@@ -66,8 +79,8 @@ const addCustomer = () => {
   }, []);
   
     // Function สำหรับลบข้อมูล
-    const deleteData = (id) => {
-      fetch(`http://localhost:8080/connectdb.php?table=customers&CustomerID=${id}`, {
+    const deleteData = (ids) => {
+      fetch(`http://localhost:8080/connectdb.php?table=customers&CustomerID=${ids.join(',')}`, {
         method: 'DELETE',
       })
       .then(response => response.text())
@@ -124,15 +137,150 @@ const editData = (id, newData) => {
   return (
     <div className='m-2 md:m-10 p-2 md:p-10 bg-white rounded-3xl'>
       <Header category="Page" title="Customers" />
-      {/* Add Form */}
-      <div className="add-form">
-        <h3>Add Customer</h3>
-        <input type="text" name="CustomerName" placeholder="Customer Name" onChange={handleFormChange} />
-        <input type="file" name="CustomerImage" onChange={handleImageChange} />
-        <button onClick={addCustomer}>Add</button>
-      </div>
+      
+       {/* Add Form */}
+        {!showAddForm ? ( // เช็คว่าควรแสดงฟอร์มหรือไม่
+          <button onClick={handleAddButtonClick} style={{backgroundColor:currentColor}} className='text-l p-3 
+          hover:drop-shadow-xl hover:bg-light-gray text-white rounded-3xl mb-5 '>Add Customer</button>
+        ) : (
+          <div className="add-form">
+            <div className="space-y-12">
+            <h2 className="text-xl font-semibold leading-7 text-gray-900">Add customer</h2>
+            
+            <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+              
+            <div className="sm:col-span-3">
+              <label htmlFor="CustomerName" className="block text-sm font-medium leading-6 text-gray-900">
+               Customer's Name
+              </label>
+              <div className="mt-2">
+                <input
+                  type="text"
+                  name="CustomerName"
+                  id="CustomerName"
+                  autoComplete="given-name"
+                  className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 sm:pl-2"
+                  onChange={handleFormChange}
+                />
+              </div>
+            </div>
 
+            <div className="sm:col-span-3">
+              <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">
+                Customer's Email
+              </label>
+              <div className="mt-2">
+                <input
+                  type="email"
+                  name="CustomerEmail"
+                  id="CustomerEmail"
+                  autoComplete="email"
+                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 sm:pl-2"
+                  onChange={handleFormChange}
+                />
+              </div>
+            </div>
+            
+            <div className="col-span-full">
+              <label htmlFor="ProjectName" className="block text-sm font-medium leading-6 text-gray-900">
+                Project's name
+              </label>
+              <div className="mt-2">
+                <input
+                  type="text"
+                  name="ProjectName"
+                  id="ProjectName"
+                  autoComplete="ProjectName"
+                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 sm:pl-2"
+                  onChange={handleFormChange}
+                />
+              </div>
+            </div>
+            
+            <div className="sm:col-span-2 sm:col-start-1">
+              <label htmlFor="Weeks" className="block text-sm font-medium leading-6 text-gray-900">
+              Weeks
+              </label>
+              <div className="mt-2">
+                <input
+                  type="text"
+                  name="Weeks"
+                  id="Weeks"
+                  autoComplete="address-level2"
+                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 sm:pl-2"
+                  onChange={handleFormChange}
+                />
+              </div>
+            </div>
+
+            <div className="sm:col-span-2">
+              <label htmlFor="region" className="block text-sm font-medium leading-6 text-gray-900">
+              Budget
+              </label>
+              <div className="mt-2">
+                <input
+                  type="text"
+                  name="Budget"
+                  id="Budget"
+                  autoComplete="Budget"
+                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 sm:pl-2"
+                  onChange={handleFormChange}
+                />
+              </div>
+            </div>
+
+            <div className="sm:col-span-2">
+              <label htmlFor="Location" className="block text-sm font-medium leading-6 text-gray-900">
+              Location
+              </label>
+              <div className="mt-2">
+                <input
+                  type="text"
+                  name="Location"
+                  id="Location"
+                  autoComplete="Location"
+                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 sm:pl-2"
+                  onChange={handleFormChange}
+                />
+              </div>
+            </div>
+            
+            <div className="col-span-full">
+              <label htmlFor="ProjectName" className="block text-sm font-medium leading-6 text-gray-900">
+                Upload Images
+              </label>
+              <div className="mt-2">
+              <input type="file" name="CustomerImage"  
+              class="block w-full text-sm text-slate-500
+              file:mr-4 file:py-2 file:px-4
+              file:rounded-full file:border-0
+              file:text-sm file:font-semibold
+              file:bg-violet-50 file:text-violet-700
+              hover:file:bg-violet-100 sm:pl-2 " 
+              onChange={handleImageChange} />
+              </div>
+            </div>
+            
+            
+            
+            <div className="col-span-full">
+            <div className="mb-6 flex items-center justify-end gap-x-6">
+            <button onClick={addCustomer} className="mt-1 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            >Add</button>
+            <button onClick={handleFormClose} className="ml-3 text-sm font-semibold leading-6 text-gray-900">Close</button> 
+            </div>
+            </div>
+            
+          </div>
+            {/* <input type="text" name="CustomerName" placeholder="Customer Name" onChange={handleFormChange} /> */} 
+          </div>
+          
+        </div>
+        
+        
+        )}
       {/* Existing GridComponent */}
+    
       <GridComponent
         dataSource={customersData}
         allowPaging
@@ -142,9 +290,8 @@ const editData = (id, newData) => {
         editSettings={{ allowDeleting: true, allowEditing: true, showDeleteConfirmDialog: true }}
         actionBegin={(args) => {
           if (args.requestType === 'delete') {
-            const customerId = args.data[0].CustomerID;
-            // console.log('Deleted customer ID:', customerId);
-            deleteData(customerId);
+            const customerIDs = args.data.map(item => item.CustomerID); // รับ ID ทั้งหมดที่ต้องการลบ
+            deleteData(customerIDs); // ส่ง IDs ไปที่ API เพื่อการลบ
           }
         }}
         actionComplete={(args) => {
