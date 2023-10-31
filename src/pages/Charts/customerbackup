@@ -2,58 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { GridComponent, ColumnsDirective, ColumnDirective, Page, Selection, Inject, Edit, Toolbar, Sort, Filter } from '@syncfusion/ej2-react-grids';
 import { Header } from '../components';
 import { customersGrid } from '../data/customerdata'; // เรียกใช้คอลัมน์และคอมโพเนนต์ของตาราง
-import axios from 'axios'; // Library for making HTTP requests
+
 
 function Customers() {
   const [customersData, setCustomersData] = useState([]); // เก็บข้อมูลจาก API ด้วย useState
-  // State to manage form data
-  // เปลี่ยนชื่อตัวแปร formData ในตำแหน่งที่ซ้ำกัน
-const [formDataAdd, setFormDataAdd] = useState({
-  CustomerName: '',
-  CustomerEmail: '',
-  ProjectName: '',
-  Status: '',
-  Weeks: '',
-  Budget: '',
-  Location: '',
-  CustomerImage: null,
-});
 
-const handleFormChange = (e) => {
-  setFormDataAdd({
-    ...formDataAdd,
-    [e.target.name]: e.target.value,
-  });
-};
-
-const handleImageChange = (e) => {
-  setFormDataAdd({
-    ...formDataAdd,
-    CustomerImage: e.target.files[0],
-  });
-};
-
-const addCustomer = () => {
-  console.log('Data from form:', formDataAdd);
-  const newData = { ...formDataAdd };
-
-  const form = new FormData();
-  Object.keys(newData).forEach((key) => {
-    form.append(key, newData[key]);
-  });
-
-  axios.post('http://localhost:8080/connectdb.php?table=customers', form)
-    .then((response) => {
-      console.log('Customer added:', response.data);
-      updateGrid();
-    })
-    .catch((error) => {
-      console.error('Error adding customer:', error);
-    });
-};
-
-
-    // นำข้อมูลจาก Api มาแสดง
   useEffect(() => {
     fetch('http://localhost:8080/connectdb.php?table=customers')
       .then(response => response.json())
@@ -120,26 +73,29 @@ const editData = (id, newData) => {
           console.error('เกิดข้อผิดพลาดในการดึงข้อมูลจาก API:', error);
         });
     };
-      
+
+    // ฟังก์ชันสำหรับการแก้ไขข้อมูล เมื่อ requestType เป็น 'save'
+    // const handleSave = (args) => {
+    //   if (args.requestType === 'save') {
+    //     const customerId = args.data[0].CustomerID;
+    //     const newData = args.data[0]; // ข้อมูลที่แก้ไข
+    //     console.log('ส่งข้อมูลไปที่ editData:', customerId, newData); // ตรวจสอบข้อมูลที่ถูกส่งไป editData
+    //     editData(customerId, newData); // ตรวจสอบว่า customerId และ newData ถูกส่งไปถูกต้องหรือไม่
+    //   }
+    // };
+    
+
+    
   return (
     <div className='m-2 md:m-10 p-2 md:p-10 bg-white rounded-3xl'>
       <Header category="Page" title="Customers" />
-      {/* Add Form */}
-      <div className="add-form">
-        <h3>Add Customer</h3>
-        <input type="text" name="CustomerName" placeholder="Customer Name" onChange={handleFormChange} />
-        <input type="file" name="CustomerImage" onChange={handleImageChange} />
-        <button onClick={addCustomer}>Add</button>
-      </div>
-
-      {/* Existing GridComponent */}
       <GridComponent
         dataSource={customersData}
         allowPaging
         allowSorting
         width="auto"
-        toolbar={['Delete', 'Update']} // เพิ่มปุ่ม Update เพื่ออัพเดทข้อมูล
-        editSettings={{ allowDeleting: true, allowEditing: true, showDeleteConfirmDialog: true }}
+        toolbar={['Add','Delete', 'Update']} // เพิ่มปุ่ม Update เพื่ออัพเดทข้อมูล
+        editSettings={{ allowDeleting: true, allowEditing: true, showDeleteConfirmDialog: true, allowAdding:true }}
         actionBegin={(args) => {
           if (args.requestType === 'delete') {
             const customerId = args.data[0].CustomerID;
