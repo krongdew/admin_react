@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { GridComponent, ColumnsDirective, ColumnDirective, Page, Selection, Inject, Edit, Toolbar, Sort, Filter } from '@syncfusion/ej2-react-grids';
-import { Header,Button } from '../components';
+import { Header } from '../components';
 import { customersGrid } from '../data/customerdata'; // เรียกใช้คอลัมน์และคอมโพเนนต์ของตาราง
 import axios from 'axios'; // Library for making HTTP requests
 import { useStateContext } from '../contexts/ContextProvider';
@@ -251,7 +251,7 @@ const editData = (id, newData) => {
               </label>
               <div className="mt-2">
               <input type="file" name="CustomerImage"  
-              class="block w-full text-sm text-slate-500
+              className="block w-full text-sm text-slate-500
               file:mr-4 file:py-2 file:px-4
               file:rounded-full file:border-0
               file:text-sm file:font-semibold
@@ -286,8 +286,9 @@ const editData = (id, newData) => {
         allowPaging
         allowSorting
         width="auto"
-        toolbar={['Delete', 'Update']} // เพิ่มปุ่ม Update เพื่ออัพเดทข้อมูล
+        toolbar={['Delete', 'Update','Edit']} // เพิ่มปุ่ม Update เพื่ออัพเดทข้อมูล
         editSettings={{ allowDeleting: true, allowEditing: true, showDeleteConfirmDialog: true }}
+       
         actionBegin={(args) => {
           if (args.requestType === 'delete') {
             const customerIDs = args.data.map(item => item.CustomerID); // รับ ID ทั้งหมดที่ต้องการลบ
